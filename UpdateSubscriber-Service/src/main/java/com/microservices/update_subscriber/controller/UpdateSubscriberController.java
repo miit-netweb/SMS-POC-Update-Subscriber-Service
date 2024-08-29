@@ -3,7 +3,6 @@ package com.microservices.update_subscriber.controller;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,13 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 public class UpdateSubscriberController {
-
-	@Autowired
 	private JwtServerProxy jwtServerProxy;
-	@Autowired
 	private SubscriberUpdateService service;
 
-	@PostMapping("update")
+	public UpdateSubscriberController(JwtServerProxy jwtServerProxy, SubscriberUpdateService service) {
+		super();
+		this.jwtServerProxy = jwtServerProxy;
+		this.service = service;
+	}
+
+	@PostMapping("/update")
 	public ResponseEntity<String> updateSubscriber(@Valid @RequestBody PersonalDetailsDto request,
 			@RequestHeader("Authorization") String token, @PathVariable Long partnerNumber,
 			@PathVariable String subscriberNumber) {
