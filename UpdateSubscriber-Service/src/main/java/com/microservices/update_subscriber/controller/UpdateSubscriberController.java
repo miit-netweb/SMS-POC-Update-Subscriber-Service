@@ -15,21 +15,17 @@ import com.microservices.update_subscriber.proxy.JwtServerProxy;
 import com.microservices.update_subscriber.service.SubscriberUpdateService;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
+@AllArgsConstructor
 @RequestMapping("/v1")
 public class UpdateSubscriberController {
 	private JwtServerProxy jwtServerProxy;
 	private SubscriberUpdateService service;
-
-	public UpdateSubscriberController(JwtServerProxy jwtServerProxy, SubscriberUpdateService service) {
-		super();
-		this.jwtServerProxy = jwtServerProxy;
-		this.service = service;
-	}
-
+	
 	@PostMapping("/update/partner-number/{partnerNumber}/subscriber-number/{subscriberNumber}")
 	public ResponseEntity<String> updateSubscriber(@Valid @RequestBody PersonalDetailsDto request,
 			@RequestHeader("Authorization") String token, @PathVariable("partnerNumber") Long partnerNumber,
@@ -43,10 +39,11 @@ public class UpdateSubscriberController {
 			responseEntity = jwtServerProxy.validateToken(token);
 		} catch (RuntimeException ex) {
 			log.error("Original exception: {}", ex.getMessage());
-			throw new ValidationException(401, "Invalid Token", HttpStatus.BAD_REQUEST);
+			throw new ValidationException(401, "Invalid Token", HttpStatus.UNAUTHORIZED);
 		}
 		// Claims Check to verify token with partner number
 		Object body = responseEntity.getBody();
+		@SuppressWarnings("unchecked")
 		Map<String, Object> responseBody = (Map<String, Object>) body;
 		String partnerNumFromClaim = Optional.ofNullable(responseBody).map(map -> (String) map.get("partnerNumber"))
 				.orElse(null);
@@ -55,13 +52,16 @@ public class UpdateSubscriberController {
 			if (service.validateSubscriber(subscriberNumber, partnerNumber)) {
 				service.updateSubscriber(request, subscriberNumber);
 			} else {
-				throw new RuntimeException(
-						"Validation Failed Partner number is not Associate with the Subscriber Number");
+				log.error("Subscriber Number is not Associate with Partner Number");
+				throw new ValidationException(422,
+						"Validation Failed Partner number is not Associate with the Subscriber Number",
+						HttpStatus.UNPROCESSABLE_ENTITY);
 			}
 		} else {
-			throw new RuntimeException("Token does not belong to the specified partner");
+			log.error("Unauthorized User");
+			throw new ValidationException(4445, "Token does not belong to the specified partner",
+					HttpStatus.UNAUTHORIZED);
 		}
-
-		return ResponseEntity.ok("Updated");
+		return ResponseEntity.ok("Subscriber Updated Successfully");
 	}
 }

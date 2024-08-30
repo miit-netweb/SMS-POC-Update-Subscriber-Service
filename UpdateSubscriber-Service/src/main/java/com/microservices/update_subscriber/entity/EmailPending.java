@@ -10,22 +10,22 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class EmailPending {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String subscriberNumber;
-    private String emailId;
-    private int code;
-    private String status;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String subscriberNumber;
+	private String emailId;
+	private int code;
+	private String status;
 
-    public EmailPending(String subscriberNumber, String emailId, int code, String status) {
-        this.subscriberNumber = subscriberNumber;
-        this.emailId = emailId;
-        this.code = code;
-        this.status = status;
-    }
+	public EmailPending(String subscriberNumber, String emailId, int code, String status) {
+		super();
+		this.subscriberNumber = subscriberNumber;
+		this.emailId = emailId;
+		this.code = code;
+		this.status = status;
+	}
 }

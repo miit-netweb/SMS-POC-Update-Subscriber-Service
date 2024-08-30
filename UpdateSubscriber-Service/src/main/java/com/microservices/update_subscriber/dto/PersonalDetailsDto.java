@@ -2,7 +2,12 @@ package com.microservices.update_subscriber.dto;
 
 import java.time.LocalDate;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,9 +47,9 @@ public class PersonalDetailsDto {
     private String cardHolder;
 
     @NotNull(message = "Card expiry date is required")
-    @Future(message = "Card expiry date must be in future")
+    @FutureOrPresent(message = "Card expiry date must be in the present or future")    
     private LocalDate cardExpiry;
-
+    
     public Long getPhoneNumber() {
         return Long.parseLong(phoneNumber);
     }
