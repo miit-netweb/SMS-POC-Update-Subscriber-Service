@@ -1,7 +1,10 @@
 package com.microservices.update_subscriber.service;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import com.microservices.update_subscriber.entity.EmailPending;
+import com.microservices.update_subscriber.publisher.RabbitMQProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,10 @@ public class SubscriberUpdateService {
 	private SubscriberRepository subscriberRepo;
 	@Autowired
 	private PersonalDetailsRepository personalDetailsRepo;
+	@Autowired
+	private RabbitMQProducer rabbitMQProducer;
+	@Autowired
+	private EmailService emailService;
 
 	public boolean validateSubscriber(String subscriberNumber, Long partnerNumber) {
 		Optional<Subscriber> optionalSubscriber = subscriberRepo.findSubscriberBySubscriberNumber(subscriberNumber);
@@ -57,8 +64,13 @@ public class SubscriberUpdateService {
 				.cardType(personalDetailsDto.getCardType())
 				.cardHolder(personalDetailsDto.getCardHolder())
 				.cardExpiry(personalDetailsDto.getCardExpiry()).build();
-		
-		
+
+		CompletableFuture.runAsync(()->{
+			EmailPending emailPending = emailService.addPendingEntry(new EmailPending(subscriberNumber,
+					personalDetails.getEmail(), 801, "EMAIL_PENDING"));
+			rabbitMQProducer.sendMessage(emailPending);
+		});
+
 		personalDetailsRepo.save(personalDetails);
 		return "Subscriber Updated Successfully";
 	}

@@ -21,4 +21,11 @@ public class EmailPending {
     private String emailId;
     private int code;
     private String status;
+
+    public EmailPending(String subscriberNumber, String emailId, int code, String status) {
+        this.subscriberNumber = subscriberNumber;
+        this.emailId = emailId;
+        this.code = code;
+        this.status = status;
+    }
 }

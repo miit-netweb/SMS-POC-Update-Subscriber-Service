@@ -2,14 +2,12 @@ package com.microservices.update_subscriber.controller;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import com.microservices.update_subscriber.service.EmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.microservices.update_subscriber.dto.PersonalDetailsDto;
 import com.microservices.update_subscriber.exception.ValidationException;
@@ -21,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
+@RequestMapping("/v1")
 public class UpdateSubscriberController {
 	private JwtServerProxy jwtServerProxy;
 	private SubscriberUpdateService service;
@@ -31,10 +30,10 @@ public class UpdateSubscriberController {
 		this.service = service;
 	}
 
-	@PostMapping("/update")
+	@PostMapping("/update/partner-number/{partnerNumber}/subscriber-number/{subscriberNumber}")
 	public ResponseEntity<String> updateSubscriber(@Valid @RequestBody PersonalDetailsDto request,
-			@RequestHeader("Authorization") String token, @PathVariable Long partnerNumber,
-			@PathVariable String subscriberNumber) {
+			@RequestHeader("Authorization") String token, @PathVariable("partnerNumber") Long partnerNumber,
+			@PathVariable("subscriberNumber") String subscriberNumber) {
 
 		log.info("Started validating user");
 
@@ -62,6 +61,7 @@ public class UpdateSubscriberController {
 		} else {
 			throw new RuntimeException("Token does not belong to the specified partner");
 		}
+
 		return ResponseEntity.ok("Updated");
 	}
 }
