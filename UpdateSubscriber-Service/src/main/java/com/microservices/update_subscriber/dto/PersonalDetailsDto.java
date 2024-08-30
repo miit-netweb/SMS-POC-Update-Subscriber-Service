@@ -4,9 +4,9 @@ import java.time.LocalDate;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,9 +47,9 @@ public class PersonalDetailsDto {
     private String cardHolder;
 
     @NotNull(message = "Card expiry date is required")
-    @PastOrPresent(message = "Card expiry date must be in the past or present")
+    @FutureOrPresent(message = "Card expiry date must be in the present or future")    
     private LocalDate cardExpiry;
-
+    
     public Long getPhoneNumber() {
         return Long.parseLong(phoneNumber);
     }

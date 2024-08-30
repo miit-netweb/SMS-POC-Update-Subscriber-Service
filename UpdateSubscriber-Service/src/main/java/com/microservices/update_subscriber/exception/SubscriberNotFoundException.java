@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ValidationException extends RuntimeException {
+public class SubscriberNotFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	private int errorcode;
