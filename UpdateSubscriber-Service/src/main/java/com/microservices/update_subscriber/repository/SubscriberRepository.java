@@ -9,5 +9,5 @@ import com.microservices.update_subscriber.entity.Subscriber;
 public interface SubscriberRepository extends JpaRepository<Subscriber,Long> {
 	
 	public Optional<Subscriber> findSubscriberBySubscriberNumber(String subscriberNumber);
-	public Optional<Subscriber> findSubscriberByMemId(Long memId );
+	public Optional<Subscriber> findSubscriberByMemID(Long memID );
 }
