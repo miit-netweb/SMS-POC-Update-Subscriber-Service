@@ -2,8 +2,11 @@ package com.microservices.update_subscriber.service;
 
 import java.util.Objects;
 import java.util.Optional;
-
+import java.util.concurrent.CompletableFuture;
 import org.springframework.http.HttpStatus;
+import com.microservices.update_subscriber.entity.EmailPending;
+import com.microservices.update_subscriber.publisher.RabbitMQProducer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.microservices.update_subscriber.dto.PersonalDetailsDto;
@@ -22,6 +25,10 @@ public class SubscriberUpdateService {
 	
 	private SubscriberRepository subscriberRepo;
 	private PersonalDetailsRepository personalDetailsRepo;
+	@Autowired
+	private RabbitMQProducer rabbitMQProducer;
+	@Autowired
+	private EmailService emailService;
 
 	public boolean validateSubscriber(String subscriberNumber, Long partnerNumber) {
 		Optional<Subscriber> optionalSubscriber = subscriberRepo.findSubscriberBySubscriberNumber(subscriberNumber);
@@ -50,8 +57,14 @@ public class SubscriberUpdateService {
 				.address(personalDetailsDto.getAddress()).cardNumber(personalDetailsDto.getCardNumber())
 				.cardType(personalDetailsDto.getCardType()).cardHolder(personalDetailsDto.getCardHolder())
 				.cardExpiry(personalDetailsDto.getCardExpiry()).build();
-
-		personalDetailsRepo.save(personalDetails);
+    
+    personalDetailsRepo.save(personalDetails);
+		CompletableFuture.runAsync(()->{
+			EmailPending emailPending = emailService.addPendingEntry(new EmailPending(subscriberNumber,
+					personalDetails.getEmail(), 801, "EMAIL_PENDING"));
+			rabbitMQProducer.sendMessage(emailPending);
+		});
+    
 		return "Subscriber Updated Successfully";
 	}
 

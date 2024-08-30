@@ -28,5 +28,4 @@ public class EmailPending {
 		this.code = code;
 		this.status = status;
 	}
-
 }
